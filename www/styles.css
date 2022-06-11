@@ -1,0 +1,85 @@
+*{
+    font-family: "Calibri", serif;
+}
+
+body{
+    padding: 0;
+    margin: 0;
+}
+
+.layout {
+    width: 100%;
+    max-width: 1024px;
+    margin: auto;
+    background-color: white;
+    border-collapse: collapse;
+}
+
+.layout tr td {
+    padding: 20px;
+    vertical-align: top;
+}
+
+.header {
+    font-size: 30px;
+}
+
+.footer {
+    text-align: center;
+}
+
+.sidebarHeader {
+    font-size: 20px;
+}
+
+.sidebar ul {
+    padding-left: 20px;
+}
+
+a, a:visited {
+    color: #27263d;
+}
+
+table, th, td {
+}
+
+ul.path_list{
+    margin-left: 0;
+    padding-left: 2%;
+}
+
+.path_list_item{
+    display: flex;
+    border-left: 3px solid black;
+    padding-left: 2%;
+}
+
+ul > ul {
+    display: none;
+}
+
+.li-trip-title{
+    cursor: pointer;
+    list-style: none;
+}
+
+h2.transport-number{
+    margin-bottom: 0;
+}
+
+p.trip{
+    margin-top: 1%;
+}
+
+header{
+    margin-top: 0;
+    padding: 20px 40px 20px 40px;
+    background: rgba(0, 0, 0, 0.6);
+    height: auto;
+}
+
+h2.headerText{
+    margin: 0;
+}
+
+

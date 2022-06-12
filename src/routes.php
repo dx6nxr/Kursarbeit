@@ -1,8 +1,12 @@
 <?php
 
+use Fahrplan\Controllers\MainController;
+use Fahrplan\Controllers\TransportController;
+
 return [
-    '~^routes/(.*)$~' => [\MyProject\Controllers\TransportController::class, 'view'],
-    '~^routes/(.*)/edit$~' => [\MyProject\Controllers\TransportController::class, 'edit'],
-    '~^routes/add$~' => [\MyProject\Controllers\TransportController::class, 'add'],
-    '~^$~' => [\MyProject\Controllers\MainController::class, 'main']
+    '~^routes/edit/(.*)$~' => [TransportController::class, 'edit'],
+    '~^routes/delete/(.*)$~' => [TransportController::class, 'delete'],
+    '~^routes/(.*)$~' => [TransportController::class, 'view'],
+    '~^add$~' => [TransportController::class, 'add'],
+    '~^$~' => [MainController::class, 'main'],
 ];

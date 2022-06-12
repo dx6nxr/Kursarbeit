@@ -1,13 +1,13 @@
 <?php
 
-namespace MyProject\Models;
+namespace Fahrplan\Models;
 
-use MyProject\Services\Db;
+use Fahrplan\Services\Db;
 
 abstract class ActiveRecordEntity
 {
     /** @var string */
-    protected $id;
+    public $id;
 
     public function getId(): string
     {
@@ -47,10 +47,10 @@ abstract class ActiveRecordEntity
         return $entities ? $entities[0] : null;
     }
 
-    public function save(): void
+    public function save(string $type): void
     {
         $mappedProperties = $this->mapPropertiesToDbFormat();
-        if ($this->id !== null) {
+        if ($type == 'update') {
             $this->update($mappedProperties);
         } else {
             $this->insert($mappedProperties);
@@ -76,11 +76,11 @@ abstract class ActiveRecordEntity
         $index = 1;
         foreach ($mappedProperties as $column => $value) {
             $param = ':param' . $index; // :param1
-            $columns2params[] = $column . ' = ' . $param; // column1 = :param1
+            $columns2params[] = $column . " = '" . $value . "'"; // column1 = :param1
             $params2values[$param] = $value; // [:param1 => value1]
             $index++;
         }
-        $sql = 'UPDATE ' . static::getTableName() . ' SET ' . implode(', ', $columns2params) . ' WHERE id = ' . $this->id;
+        $sql = 'UPDATE ' . static::getTableName() . ' SET ' . implode(', ', $columns2params) . ' WHERE id = "' . $this->id . '"';
         $db = Db::getInstance();
         $db->query($sql, $params2values, static::class);
     }
@@ -103,11 +103,9 @@ abstract class ActiveRecordEntity
         $paramsNamesViaSemicolon = implode(', ', $paramsNames);
 
         $sql = 'INSERT INTO ' . static::getTableName() . ' (' . $columnsViaSemicolon . ') VALUES (' . $paramsNamesViaSemicolon . ');';
-
         $db = Db::getInstance();
         $db->query($sql, $params2values, static::class);
         $this->id = $db->getLastInsertId();
-        $this->refresh();
     }
 
     private function refresh(): void
@@ -131,8 +129,7 @@ abstract class ActiveRecordEntity
         $mappedProperties = [];
         foreach ($properties as $property) {
             $propertyName = $property->getName();
-            $propertyNameAsUnderscore = $this->camelCaseToUnderscore($propertyName);
-            $mappedProperties[$propertyNameAsUnderscore] = $this->$propertyName;
+            $mappedProperties[$property->getName()] = $this->$propertyName;
         }
 
         return $mappedProperties;

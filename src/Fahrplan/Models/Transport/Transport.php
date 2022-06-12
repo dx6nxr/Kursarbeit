@@ -1,8 +1,8 @@
 <?php
 
-namespace MyProject\Models\Transport;
+namespace Fahrplan\Models\Transport;
 
-use MyProject\Models\ActiveRecordEntity;
+use Fahrplan\Models\ActiveRecordEntity;
 
 class Transport extends ActiveRecordEntity
 {
@@ -31,6 +31,11 @@ class Transport extends ActiveRecordEntity
     public function setText(string $text): void
     {
         $this->stops = $text;
+    }
+
+    public function setId(string $id):void
+    {
+        $this->id = $id;
     }
 
     protected static function getTableName(): string

@@ -11,8 +11,8 @@
             </h2>
             <p class="trip"><strong>
 
-                    <?= json_decode($transport->GetText(), true)['stop1'] . ' > ' .
-                    json_decode($transport->GetText(), true)[count((array)json_decode($transport->GetText()))] ?>
+                    <?= json_decode($transport->GetText(), true)[0] . ' > ' .
+                    json_decode($transport->GetText(), true)[count((array)json_decode($transport->GetText()))-1] ?>
 
                 </strong></p>
         </li>

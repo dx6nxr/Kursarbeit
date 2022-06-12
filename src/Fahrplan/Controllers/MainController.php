@@ -1,9 +1,9 @@
 <?php
 
-namespace MyProject\Controllers;
+namespace Fahrplan\Controllers;
 
-use MyProject\Models\Transport\Transport;
-use MyProject\View\View;
+use Fahrplan\Models\Transport\Transport;
+use Fahrplan\View\View;
 
 class MainController
 {

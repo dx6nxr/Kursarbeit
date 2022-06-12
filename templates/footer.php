@@ -4,6 +4,7 @@
     <div class="sidebarHeader">Меню</div>
     <ul>
         <li><a href="/www">Main page</a></li>
+        <li><a href="/www/add">Create new instance</a></li>
         <!--<li><a href="/"></a></li>-->
     </ul>
 </td>

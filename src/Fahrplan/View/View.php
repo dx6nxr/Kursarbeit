@@ -1,6 +1,6 @@
 <?php
 
-namespace MyProject\View;
+namespace Fahrplan\View;
 
 class View
 {

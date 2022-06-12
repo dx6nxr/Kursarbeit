@@ -1,6 +1,6 @@
 <?php
 
-namespace MyProject\Services;
+namespace Fahrplan\Services;
 
 class Db
 {
@@ -29,7 +29,6 @@ class Db
         if (false === $result) {
             return null;
         }
-
         return $sth->fetchAll(\PDO::FETCH_CLASS, $className);
     }
 

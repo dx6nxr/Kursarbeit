@@ -24,7 +24,7 @@ class TransportController
             return;
         }
 
-        $this->view->renderHtml('articles/view.php', [
+        $this->view->renderHtml('routes/view.php', [
             'transport' => $transport
         ]);
     }
@@ -33,7 +33,7 @@ class TransportController
     {
         $name = $_GET['name'];
         $trip = $_GET['trip'];
-        //$num = $_GET['id'];
+        $pass = $_GET['MasterPass'];
         /** @var Transport $edit */
         $edit = Transport::getById($transportNum);
 
@@ -43,24 +43,33 @@ class TransportController
             return;
         }
 
-        $jsonTrips = explode (", ", $trip);
-        foreach ($jsonTrips as $key => $jsonTrip) {
-            $arr[$key] = $jsonTrip;
-        }
+            $jsonTrips = explode(", ", $trip);
+            foreach ($jsonTrips as $key => $jsonTrip) {
+                $arr[$key] = $jsonTrip;
+            }
 
-        $arr = json_encode($arr, true);
+            $arr = json_encode($arr, true);
 
-        if($name != '' and $trip != ''){
-            $edit->setName($name);
-            $edit->setText($arr);
-        }
-        else{
-            $this->view->renderHtml('sub/edit.php', [
-                'info' => $edit
-            ], 200);
-            return;
-        }
-        $edit->save('update');
+            if ($name != '' and $trip != '') {
+                if($pass == self::getMasterPass()) {
+                    $edit->setName($name);
+                    $edit->setText($arr);
+
+                    $edit->save('update');
+                }
+                else {
+                    $this->view->renderHtml('sub/edit.php', [
+                        'info' => $edit,
+                        'error' => "Incorrect MasterPass"
+                    ], 200);
+                    return;
+                }
+            } else {
+                $this->view->renderHtml('sub/edit.php', [
+                    'info' => $edit
+                ], 400);
+                return;
+            }
 
         header('Location: /www/index.php');
     }
@@ -69,6 +78,7 @@ class TransportController
         $name = $_GET['name'];
         $trip = $_GET['trip'];
         $num = $_GET['id'];
+        $pass = $_GET['MasterPass'];
 
         $trip = strtolower($trip);
         $name = strtolower($name);
@@ -80,40 +90,68 @@ class TransportController
             //var_dump($edit);
             return;
         }
+        if($pass == self::getMasterPass()) {
+            $new = new Transport();
+            $new->setId($num);
+            $new->setName($name);
 
-        $new = new Transport();
-        $new->setId($num);
-        $new->setName($name);
+            $jsonTrips = explode(", ", $trip);
+            foreach ($jsonTrips as $key => $jsonTrip) {
+                $arr[$key] = $jsonTrip;
+            }
+            $arr = json_encode($arr, true);
 
-        $jsonTrips = explode (", ", $trip);
-        foreach ($jsonTrips as $key => $jsonTrip) {
-            $arr[$key] = $jsonTrip;
+            $new->setText($arr);
+
+            $new->save('add');
+
+            header('Location: index.php');
         }
-        $arr = json_encode($arr, true);
-
-        $new->setText($arr);
-
-        $new->save('add');
-
-        header('Location: index.php');
-
+        else{
+            $this->view->renderHtml('sub/create.php', [
+                'error' => "Incorrect MasterPass",
+                'name' => $name,
+                'trip' => $trip,
+                'num' => $num
+            ], 200);
+            //var_dump($edit);
+            return;
+        }
         //var_dump($new);
     }
 
     public function delete(string $transportNum): void
     {
-        //$num = $_GET['id'];
+        $pass = $_GET['MasterPass'];
         /** @var Transport $edit */
         $edit = Transport::getById($transportNum);
 
         if ($edit === null) {
-            $this->view->renderHtml('errors/404.php', [], 404);
+            $this->view->renderHtml('sub/delete.php', [], 200);
             //var_dump($edit);
             return;
         }
+        else{
 
-        $edit->delete();
+            if ($pass == self::getMasterPass()){
+                $edit->delete();
+            }
+            else{
+                $this->view->renderHtml('sub/delete.php', [
+                    'error' => 'Incorrect MasterPass'
+                ], 200);
+                //var_dump($edit);
+                return;
+            }
+        }
+
 
         header('Location: /www/index.php');
     }
+
+    private static function getMasterPass(): string
+    {
+        return 'hardpass123';
+    }
 }
+

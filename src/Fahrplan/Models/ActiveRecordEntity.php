@@ -7,21 +7,18 @@ use Fahrplan\Services\Db;
 abstract class ActiveRecordEntity
 {
     /** @var string */
-    public $id;
+    protected $id;
 
+    public function __set($name, $value){
+        $name = ActiveRecordEntity::underscoreToCamelCase($name);
+        $this->$name = $value;
+    }
     public function getId(): string
     {
         return $this->id;
     }
 
-    public function __set(string $name, $value)
-    {
-            $camelCaseName = $this->underscoreToCamelCase($name);
-
-            $this->$camelCaseName = $value;
-    }
-
-    private function underscoreToCamelCase(string $source): string
+    public function underscoreToCamelCase(string $source): string
     {
         return lcfirst(str_replace('_', '', ucwords($source, '_')));
     }
@@ -53,6 +50,7 @@ abstract class ActiveRecordEntity
         if ($type == 'update') {
             $this->update($mappedProperties);
         } else {
+            //print_r($mappedProperties);
             $this->insert($mappedProperties);
         }
     }
@@ -76,7 +74,7 @@ abstract class ActiveRecordEntity
         $index = 1;
         foreach ($mappedProperties as $column => $value) {
             $param = ':param' . $index; // :param1
-            $columns2params[] = $column . " = '" . $value . "'"; // column1 = :param1
+            $columns2params[] = ActiveRecordEntity::camelCaseToUnderscore($column) . " = '" . $value . "'"; // column1 = :param1
             $params2values[$param] = $value; // [:param1 => value1]
             $index++;
         }
@@ -93,14 +91,15 @@ abstract class ActiveRecordEntity
         $paramsNames = [];
         $params2values = [];
         foreach ($filteredProperties as $columnName => $value) {
-            $columns[] = '`' . $columnName. '`';
-            $paramName = ':' . $columnName;
+            $columns[] = '`' . ActiveRecordEntity::camelCaseToUnderscore($columnName) . '`';
+            $paramName = ':' . ActiveRecordEntity::camelCaseToUnderscore($columnName);
             $paramsNames[] = $paramName;
+            $paramName = $paramName;
             $params2values[$paramName] = $value;
         }
-
         $columnsViaSemicolon = implode(', ', $columns);
         $paramsNamesViaSemicolon = implode(', ', $paramsNames);
+
 
         $sql = 'INSERT INTO ' . static::getTableName() . ' (' . $columnsViaSemicolon . ') VALUES (' . $paramsNamesViaSemicolon . ');';
         $db = Db::getInstance();
@@ -131,12 +130,30 @@ abstract class ActiveRecordEntity
             $propertyName = $property->getName();
             $mappedProperties[$property->getName()] = $this->$propertyName;
         }
-
         return $mappedProperties;
     }
 
-    private function camelCaseToUnderscore(string $source): string
+    public function setId(string $id):void
+    {
+        $this->id = $id;
+    }
+
+    public function camelCaseToUnderscore(string $source): string
     {
         return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $source));
+    }
+
+    public static function findOneByColumn(string $columnName, $value): ?self
+    {
+        $db = Db::getInstance();
+        $result = $db->query(
+            'SELECT * FROM `' . static::getTableName() . '` WHERE `' . $columnName . '` = :value LIMIT 1;',
+            [':value' => $value],
+            static::class
+        );
+        if ($result === []) {
+            return null;
+        }
+        return $result[0];
     }
 }

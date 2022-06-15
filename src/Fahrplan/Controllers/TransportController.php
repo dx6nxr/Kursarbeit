@@ -3,6 +3,7 @@
 namespace Fahrplan\Controllers;
 
 use Fahrplan\Models\Transport\Transport;
+use Fahrplan\Models\Users\UsersAuthService;
 use Fahrplan\View\View;
 
 class TransportController
@@ -18,6 +19,7 @@ class TransportController
     public function view(string $id)
     {
         $transport = Transport::getById($id);
+        $user = UsersAuthService::getUserByToken();
 
         if ($transport === null) {
             $this->view->renderHtml('errors/404.php', [], 404);
@@ -25,7 +27,8 @@ class TransportController
         }
 
         $this->view->renderHtml('routes/view.php', [
-            'transport' => $transport
+            'transport' => $transport,
+            'user' => $user
         ]);
     }
 
@@ -33,7 +36,7 @@ class TransportController
     {
         $name = $_GET['name'];
         $trip = $_GET['trip'];
-        $pass = $_GET['MasterPass'];
+        $user = UsersAuthService::getUserByToken();
         /** @var Transport $edit */
         $edit = Transport::getById($transportNum);
 
@@ -51,7 +54,7 @@ class TransportController
             $arr = json_encode($arr, true);
 
             if ($name != '' and $trip != '') {
-                if($pass == self::getMasterPass()) {
+                if($user->getRole() == "admin") {
                     $edit->setName($name);
                     $edit->setText($arr);
 
@@ -60,14 +63,15 @@ class TransportController
                 else {
                     $this->view->renderHtml('sub/edit.php', [
                         'info' => $edit,
-                        'error' => "Incorrect MasterPass"
+                        'error' => 'You re not an admin'
                     ], 200);
                     return;
                 }
             } else {
                 $this->view->renderHtml('sub/edit.php', [
-                    'info' => $edit
-                ], 400);
+                    'info' => $edit,
+                    'user' =>  $user
+                ], 200);
                 return;
             }
 
@@ -78,19 +82,18 @@ class TransportController
         $name = $_GET['name'];
         $trip = $_GET['trip'];
         $num = $_GET['id'];
-        $pass = $_GET['MasterPass'];
 
         $trip = strtolower($trip);
         $name = strtolower($name);
 
-        //http://fahrplan2/www/add?id=12&name=bus&trip=trip
+        $user = UsersAuthService::getUserByToken();
 
         if($num === null){
-            $this->view->renderHtml('sub/create.php', [], 200);
+            $this->view->renderHtml('sub/create.php', ['user'=>$user], 200);
             //var_dump($edit);
             return;
         }
-        if($pass == self::getMasterPass()) {
+        if($user->getRole() == "admin") {
             $new = new Transport();
             $new->setId($num);
             $new->setName($name);
@@ -109,7 +112,7 @@ class TransportController
         }
         else{
             $this->view->renderHtml('sub/create.php', [
-                'error' => "Incorrect MasterPass",
+                'error' => 'You re not an admin',
                 'name' => $name,
                 'trip' => $trip,
                 'num' => $num
@@ -122,36 +125,24 @@ class TransportController
 
     public function delete(string $transportNum): void
     {
-        $pass = $_GET['MasterPass'];
+        $user = UsersAuthService::getUserByToken();
         /** @var Transport $edit */
         $edit = Transport::getById($transportNum);
 
         if ($edit === null) {
-            $this->view->renderHtml('sub/delete.php', [], 200);
+            $this->view->renderHtml('errors/404.php', [], 404);
             //var_dump($edit);
             return;
         }
         else{
 
-            if ($pass == self::getMasterPass()){
+            if ($user->getRole() == "admin"){
                 $edit->delete();
-            }
-            else{
-                $this->view->renderHtml('sub/delete.php', [
-                    'error' => 'Incorrect MasterPass'
-                ], 200);
-                //var_dump($edit);
-                return;
             }
         }
 
 
         header('Location: /www/index.php');
-    }
-
-    private static function getMasterPass(): string
-    {
-        return 'hardpass123';
     }
 }
 

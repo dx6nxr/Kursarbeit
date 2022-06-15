@@ -1,5 +1,7 @@
 <?php
 
+use Fahrplan\View\View;
+
 spl_autoload_register(function (string $className) {
     require_once __DIR__ . '/../src/' . str_replace('\\', '/', $className) . '.php';
 });
@@ -17,7 +19,8 @@ foreach ($routes as $pattern => $controllerAndAction) {
 }
 
 if (!$isRouteFound) {
-    echo 'Страница не найдена!';
+    $view = new View(__DIR__ . '/../templates');
+    $view->renderHtml('errors/404.php', [], 404);
     return;
 }
 

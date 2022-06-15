@@ -7,6 +7,7 @@ use Fahrplan\Models\ActiveRecordEntity;
 class Transport extends ActiveRecordEntity
 {
 
+
     /** @var string */
     protected $name;
 
@@ -31,11 +32,6 @@ class Transport extends ActiveRecordEntity
     public function setText(string $text): void
     {
         $this->stops = $text;
-    }
-
-    public function setId(string $id):void
-    {
-        $this->id = $id;
     }
 
     protected static function getTableName(): string

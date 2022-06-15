@@ -12,16 +12,13 @@ $stops = substr($stops, 0, -2);
 <input type="text" value="<?= $info->GetName() ?>" name="type" id="type">
 <br>
 <textarea rows="6" cols="50" value="" name="trip" id="trip"><?= $stops ?></textarea>
-<br>
-<input type="password" placeholder="Masterpass" name="pass" id="pass">
 <button onclick = "f()">Submit</button>
 <script>
     function f(){
         let type = document.getElementById('type').value;
         let trip = document.getElementById('trip').value;
-        let pass = document.getElementById('pass').value;
-        if(num != '' && type != '' && trip != '' && pass != '') {
-            window.location.replace(`?name=${type}&trip=${trip}&MasterPass=${pass}`);
+        if(num != '' && type != '' && trip != '') {
+            window.location.replace(`?name=${type}&trip=${trip}`);
         }
         else{
             alert ("please fill out all forms");

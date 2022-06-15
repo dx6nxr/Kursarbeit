@@ -1,4 +1,5 @@
 <?php include __DIR__ . '/../header.php'; ?>
+<?= !empty($user) ? 'Привет, ' . $user->getRole() . " - " . $user->getNickname() : 'Войдите на сайт' ?>
 <ul id="menu" class="list">
     <?php foreach ($transports as $transport): ?>
 

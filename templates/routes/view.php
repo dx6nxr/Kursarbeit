@@ -14,8 +14,8 @@
                 <li class="path_list_item"> <?= $stop ?></li>
             <?php endforeach; ?>
         </ul>
-<a href="/www/routes/edit/<?= $transport->GetId() ?>">Edit This transport</a><br>
-<a href="/www/routes/delete/<?= $transport->GetId() ?>">Delete This transport</a>
+<?php if($user)if($user -> getRole() == "admin") echo '<a href="/www/routes/edit/'.$transport->GetId() .'">Edit This transport</a><br>'; ?>
+<?php if($user)if($user -> getRole() == "admin") echo '<a href="/www/routes/delete/'.$transport->GetId().'">Delete This transport</a>';?>
     <script type="text/javascript">
         $(document).on('click', '.list > li ', function () {
             $(this).next('ul').slideToggle("slow", function (){});
